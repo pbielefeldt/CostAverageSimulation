@@ -14,22 +14,29 @@ using namespace std;
 TRandom *rng = new TRandom2();
 
 // one simulation run
-std::vector<double> sample(
+// return value: <number, value> for each year
+std::vector< std::pair<double,double> > sample(
   double start_value,
   double add_annual,
   double avg_yield,
   double yield_sigma,
   int years)
 {
-  double this_value = start_value;
-  std::vector<double> re_sample;
+  double current_price = 100.; // without loss ov generality
+  // number of shares (or whatever)
+  double current_amount = start_value/current_price; 
+  std::vector< std::pair<double,double> > re_sample;
   
   for (int i=0; i<years; i++)
   {
     double this_year_yield = rng->Gaus(avg_yield, yield_sigma);
     
-    this_value = (this_value * (1+this_year_yield)) + add_annual;
-    re_sample.push_back(this_value);
+    current_price = current_price * (1.+this_year_yield);
+    current_amount += add_annual/current_price;
+    
+    re_sample.push_back(
+      std::make_pair(current_amount, current_price)
+    );
   }
   
   return re_sample;
@@ -54,9 +61,12 @@ void TotalReturnSim()
   // main loop
   for (int y=0; y<runs; y++)
   {
-      std::vector<double> my_sample 
+      std::vector< std::pair<double,double> > my_sample 
         = sample(0, annual_payment, average_yield/100., yield_sigma/100., number_of_years);
-      result->Fill(my_sample.back());
+      
+      result->Fill(
+        my_sample.back().first * my_sample.back().second
+      );
   }
   
   TCanvas *c1 = new TCanvas("c1","result",200,10,700,500);
