@@ -12,6 +12,15 @@ If the investment performs very well for the first years, but worse later, the c
 To investigate this, I started this cute little tool.
 Feel free to use it and send me improvements.
 
+### Some image:
+yield: 6%
+spread 1.5%
+![06.0-pm-01.5](https://user-images.githubusercontent.com/13000622/55651724-dab80400-57e9-11e9-9a4d-a8b55725efaf.gif)
+
+yield 6%
+spread 3%
+![06.0-pm-03](https://user-images.githubusercontent.com/13000622/55651851-2cf92500-57ea-11e9-98cd-1f04b1d1a404.gif)
+
 ### "Installation"
 This is only a script that was intended to be executed with [ROOT](https://root.cern.ch/ "ROOT web page").
 If you have ROOT installed, execute it by running `root TotalReturnSim.C`.
