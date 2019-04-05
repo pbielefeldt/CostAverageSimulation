@@ -1,3 +1,16 @@
+#include <iostream>
+#include <cmath>
+
+#include "TROOT.h"
+#include "TSystem.h"
+//#include "TApplication.h"
+#include "TRandom.h"
+#include "TRandom2.h"
+#include "TH1D.h"
+#include "TCanvas.h"
+
+using namespace std;
+
 TRandom *rng = new TRandom2();
 
 // one simulation run
@@ -27,14 +40,14 @@ void TotalReturnSim()
 {
 //----------------------------------------------------------------------------//
   double annual_payment = 100;    // currency
-  double average_yield = 6;       // percent points
-  double yield_sigma   = 1.5;     // percent points
+  double average_yield = 5;       // percent points
+  double yield_sigma   = 7.5;     // percent points
   int number_of_years = 30;       // duration in years
   
 //----------------------------------------------------------------------------//
-  int runs = 5000;                // number of simulation runs
+  int runs = 250000;                // number of simulation runs
   TH1D* result 
-    = new TH1D("result", "distribution of final amount", 500, 0., 10000.);
+    = new TH1D("result", "distribution of final amount", 1500, 0., 30000.);
   result->GetXaxis()->SetTitle("final amount");
   result->GetYaxis()->SetTitle("prevalence");
   
