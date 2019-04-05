@@ -27,7 +27,8 @@ void TotalReturnSim()
 {
 //----------------------------------------------------------------------------//
   double annual_payment = 100;    // currency
-  double average_yield = 6;       // percent
+  double average_yield = 6;       // percent points
+  double yield_sigma   = 1.5;     // percent points
   int number_of_years = 30;       // duration in years
   
 //----------------------------------------------------------------------------//
@@ -41,7 +42,7 @@ void TotalReturnSim()
   for (int y=0; y<runs; y++)
   {
       std::vector<double> my_sample 
-        = sample(0, annual_payment, average_yield/100., 0.015, number_of_years);
+        = sample(0, annual_payment, average_yield/100., yield_sigma/100., number_of_years);
       result->Fill(my_sample.back());
   }
   
