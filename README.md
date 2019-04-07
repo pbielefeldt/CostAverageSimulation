@@ -9,4 +9,4 @@ I just realised that with minor tweaks, the Total Return simulation I wrote is a
 
 ### "Installation"
 This is only a script that was intended to be executed with [ROOT](https://root.cern.ch/ "ROOT web page").
-If you have ROOT installed, execute it by running `root TotalReturnSim.C+`.
+If you have ROOT installed, execute it by running `root CostAverageSim.C+`.
