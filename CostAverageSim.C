@@ -15,6 +15,7 @@
 using namespace std;
 
 TRandom *rng = new TRandom2();
+TH1D *yield_distr = new TH1D("yield_distr", "yearly yields", 800, 0.6, 1.4);
 
 // one simulation run
 // return value: <number, value> for each year
@@ -29,10 +30,18 @@ std::vector< std::pair<double,double> > sample(
   // number of shares (or whatever)
   double current_amount = (start_value+add_monthly)/current_price;; 
   std::vector< std::pair<double,double> > re_sample;
+  double y=1;
   
   for (int i=0; i<12*years; i++)
   {
     double this_month_yield = rng->Gaus(avg_yield, yield_sigma-1.);
+    
+    if(i%12==0)
+    {
+      yield_distr->Fill(y);
+      y = 1;
+    }
+    y *= this_month_yield;
     
     current_price = current_price * this_month_yield;
     re_sample.push_back(
@@ -60,7 +69,7 @@ void CostAverageSim()
 //----------------------------------------------------------------------------//
   double monthly_payment = 100;   // currency
   double average_yield = 5;       // percent points
-  double yield_sigma   = 7.5;     // percent points
+  double yield_sigma   = 15;     // percent points
   int number_of_years = 30;       // duration in years
   
 //----------------------------------------------------------------------------//
