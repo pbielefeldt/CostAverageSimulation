@@ -7,6 +7,7 @@
 //#include "TApplication.h"
 #include "TRandom.h"
 #include "TRandom2.h"
+#include "TMath.h"
 #include "TH1D.h"
 #include "TF1.h"
 #include "TCanvas.h"
@@ -19,36 +20,45 @@ TRandom *rng = new TRandom2();
 // return value: <number, value> for each year
 std::vector< std::pair<double,double> > sample(
   double start_value,
-  double add_annual,
+  double add_monthly,
   double avg_yield,
   double yield_sigma,
   int years)
 {
-  double current_price = 100.; // without loss ov generality
+  double current_price = 100.; // without loss of generality
   // number of shares (or whatever)
-  double current_amount = start_value/current_price; 
+  double current_amount = (start_value+add_monthly)/current_price;; 
   std::vector< std::pair<double,double> > re_sample;
   
-  for (int i=0; i<years; i++)
+  for (int i=0; i<12*years; i++)
   {
-    double this_year_yield = rng->Gaus(avg_yield, yield_sigma);
+    double this_month_yield = rng->Gaus(avg_yield, yield_sigma-1.);
     
-    current_price = current_price * (1.+this_year_yield);
-    current_amount += add_annual/current_price;
-    
+    current_price = current_price * this_month_yield;
     re_sample.push_back(
       std::make_pair(current_amount, current_price)
     );
+    // value after the month (that's why current_amount will be calulated hereafter) 
+    
+    current_amount = add_monthly/current_price;
+    
   }
   
   return re_sample;
 }
 
+double integrated_value(std::vector< std::pair<double,double> > v)
+{
+  double n = 0;
+  for (auto& i:v) n += i.first; // sum up all the shares
+  return n*v.back().second; // number of shares × value of shares at the end
+}
+
 // main ROOT function
-void TotalReturnSim()
+void CostAverageSim()
 {
 //----------------------------------------------------------------------------//
-  double annual_payment = 100;    // currency
+  double monthly_payment = 100;   // currency
   double average_yield = 5;       // percent points
   double yield_sigma   = 7.5;     // percent points
   int number_of_years = 30;       // duration in years
@@ -56,7 +66,7 @@ void TotalReturnSim()
 //----------------------------------------------------------------------------//
   int runs = 250000;                // number of simulation runs
   double xmin = 0.;
-  double xmax = 30000.;
+  double xmax = 150000.;
   TH1D* result 
     = new TH1D("result", "distribution of final amount", 1500, xmin, xmax);
   result->GetXaxis()->SetTitle("final amount");
@@ -73,16 +83,17 @@ void TotalReturnSim()
   gauss_expo->SetParName(2,"sigma");
   gauss_expo->SetParName(3,"lambda");
   
+  const double mon_yield = TMath::Power(1.+(average_yield/100.), 1./12.);
+  const double mon_sigma = TMath::Power(1.+(yield_sigma/100.), 1./12.);
+  
   // main loop
   for (int y=0; y<runs; y++)
   {
       // receive this simulation run's results
       std::vector< std::pair<double,double> > my_sample 
-        = sample(0, annual_payment, average_yield/100., yield_sigma/100., number_of_years);
+        = sample(0, monthly_payment, mon_yield, mon_sigma, number_of_years);
       
-      result->Fill(
-        my_sample.back().first * my_sample.back().second
-      );
+      result->Fill( integrated_value(my_sample) );
   }
   
   // fit parameters
